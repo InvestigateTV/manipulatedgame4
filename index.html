@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InvestigateTV AI Quiz - Text Version</title>
+  </head>
+  <style>
+  body {
+    background-color: #000000;
+  }
+  .quiz-container {
+    background: url("https://raw.githubusercontent.com/InvestigateTV/manipulatedgame1/main/images/manipulated_matchup_bg.png");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    font-family: "Arial", Helvetica, sans-serif;
+    color: #fff;
+    margin: 0 auto;
+    display: none;
+    padding: 6px;
+    align-items: center;
+  }
+
+
+  .quiz-container h1 {
+    font-family: "Arial", Helvetica, sans-serif;
+    font-size: 22px;
+    font-weight: normal;
+    text-align: center;
+    color: #fff
+  }
+
+  .quiz-container .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .quiz-container .option {
+    border: none;
+    padding: 20px 28px;
+    font-size: 18px;
+    background: #9EB8EB;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 8px;
+  }
+
+  .quiz-container button {
+    cursor: pointer;
+  }
+
+  .disabled {
+    pointer-events: none;
+  }
+
+  .option.correct {
+    background: #A3C76E;
+    color: #222;
+    position: relative;
+    border: 3px solid #415C1D;
+  }
+
+  .option.correct::after {
+    content: "Correct!";
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #A3C76E;
+    color: #222;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+    border: 3px solid #415C1D
+  }
+
+  .option.incorrect {
+    background: #EF5D4C;
+    position: relative;
+    border: 3px solid #b92b2b; /* Corrected typo: 33px to 3px */
+  }
+
+  .option.incorrect::after {
+    content: "Incorrect";
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #EF5D4C;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+    border: 3px solid #b92b2b
+  }
+
+  .quiz-container .next-btn,
+  .quiz-result .retake-btn {
+    background: #12326D;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 32px;
+    font-size: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 3px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .quiz-result {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 auto;
+    font-family: "Arial", Helvetica, sans-serif;
+    color: #fff;
+    padding: 8px;
+  }
+
+  .quiz-result h2 {
+    font-family: "Arial", Helvetica, sans-serif;
+    font-weight: normal;
+    text-align: center;
+    color: #fff
+  }
+
+  .quiz-result .question-container {
+    padding: 6px;
+    border: 1px solid #9EB8EB;
+    display: block;
+    height: 100%;
+    flex-flow: row;
+    flex-shrink: 3;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .quiz-result .question-container.incorrect {
+    background: #e63946;
+    color: #fff;
+  }
+  .quiz-result .question-container.correct
+  {
+    background: #A3C76E;
+    color: #fff;
+  }
+
+  .question-number {
+    font-size: 12px;
+    background: #9EB8EB;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 16px 0;
+  }
+
+  @media (max-width: 700px) {
+    .quiz-container .options {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .start-btn-container {
+    position: static;
+
+    font-family: "Arial", Helvetica, sans-serif;
+    font-weight: normal;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .start-btn-container h2 {
+    font-size: 40px;
+    margin: 0;
+  }
+
+  .start-btn-container .start-btn {
+    position: relative;
+    top: 50%;
+    background: #9EB8EB;
+    color: #fff;
+    padding: 8px 32px;
+    border-radius: 8px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  /* New styles for text blocks */
+  .question-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #9EB8EB;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
+  .question-text-block {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px; /* Increased for readability */
+    line-height: 1.1; /* Increased for readability */
+    text-align: left;
+  }
+
+  .question-text-block .indented-paragraph { /* New CSS for indented paragraphs */
+    text-indent: 1em;
+    margin-top: 0.25em; /* Spacing between paragraphs */
+    margin-bottom: 0;
+  }
+
+  .question-text-block .indented-paragraph:first-child {
+    margin-top: 0; /* No top margin for the very first paragraph in the block */
+  }
+
+  .quiz-result .result-text-blocks {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    text-align: left;
+  }
+
+  .quiz-result .result-text-blocks .indented-paragraph { /* Apply indent to result paragraphs too */
+    text-indent: 1em;
+    margin-top: 0.25em;
+    margin-bottom: 0;
+  }
+  .quiz-result .result-text-blocks .indented-paragraph:first-child {
+    margin-top: 0;
+  }
+
+  </style>
+
+
+  <body>
+    <div class="start-btn-container">
+      <img src="https://raw.githubusercontent.com/InvestigateTV/manipulatedgame1/main/images/manipulated_matchup.png" alt="Illustration of a hand below a glowing set of lines and dots designed to represent artificial intelligence. The words manipulated matchup are printed above the illustration" width=100% margin=0 >
+      <p style="color:#fff;">Test your skills at identifying <br> AI generated text </p>
+      <button class="start-btn">Start Quiz</button>
+    </div>
+
+    <div class="quiz-container">
+      <h1>Which story was written by AI?</h1>
+      <div class="question-number"></div>
+      <div class="question-label">Story #1</div>
+      <div id="text-block-1" class="question-text-block"></div>
+      <div class="question-label">Story #2</div>
+      <div id="text-block-2" class="question-text-block"></div>
+      <div class="options"></div>
+      <button class="next-btn">Next</button>
+    </div>
+
+    <div class="quiz-result"></div>
+  </body>
+
+
+<script>
+  // Helper function to format text into paragraphs with indents
+  const formatTextToParagraphs = (text) => {
+    // Split by one or more newline characters to separate paragraphs
+    // Filter out any empty strings that might result from multiple newlines
+    const paragraphs = text.split(/\n+/).filter(p => p.trim() !== '');
+    return paragraphs.map(p => `<p class="indented-paragraph">${p.trim()}</p>`).join('');
+  };
+
+  let quizData = [
+    {
+      textBlock1: `The U.S. Postal Service on Saturday announced it will issue a commemorative Forever stamp honoring Georgia’s only U.S. president, Jimmy Carter.
+The Postal Service plans to release the stamp for purchase here in Atlanta on October 1, which would have been former President Carter’s 101st birthday.
+He died Dec. 29, 2024, at the age of 100.
+“The stamp program celebrates the best in American culture, places and people, and it is difficult to consider a more fitting honoree than former President Jimmy Carter,” said Peter Pastre, the Postal Service’s government relations and public policy vice president. “In his support and leadership of his beloved community, state and nation, he lent his quiet, thoughtful and deliberate energy around causes he believed in, and most certainly in his conduct and accomplishments as a former president.
+“Jimmy Carter truly personified the best in America. I am honored to participate in the reveal of this stamp art which fully evokes his humanity.”
+The stamp art is a 1982 oil-on-linen painting created in preparation for President Carter’s official White House portrait.
+“The Carter family and the Friends of Jimmy Carter are honored to be able to take part in revealing the design for President Carter’s Forever stamp,” Kim Carter Fuller, executive director of the Friends of Jimmy Carter, said. “Together we’ve had the distinct privilege of a front row seat to his life and legacy, and today’s reveal gives the world an opportunity to share his legacy with others on a daily basis.”`,
+      textBlock2: `The U.S. Postal Service has announced a new Forever stamp honoring former President Jimmy Carter, with a special release planned for Atlanta on October 1st. This date would have marked Carter's 101st birthday. The former president passed away on December 29, 2024, at the age of 100.
+The design for the commemorative stamp was unveiled today at the Jimmy Carter National Historical Park in Plains, Georgia. Kim Carter Fuller, executive director of the Friends of Jimmy Carter, stated, "The Carter family and the Friends of Jimmy Carter are honored to be able to take part in revealing the design for President Carter’s Forever stamp." She added, "Today’s reveal gives the world an opportunity to share his legacy with others on a daily basis."
+The stamp serves as a lasting tribute to the beloved Georgia native and Nobel Peace Prize laureate. Atlanta residents and stamp collectors can anticipate acquiring this piece of history this fall.`,
+      options: ["Story #1", "Story #2"],
+      correct: "Story #2",
+    },
+    {
+      textBlock1: `Stockbridge Police are investigating a surge in vehicle break-ins, with nineteen "entering autos" reported last night across multiple subdivisions including Glynn Addy, Gardens at Eagles Landing, Windsong Plantation, and Wild Wind.
+Authorities are urging residents in these areas with home security cameras to review their footage and share any suspicious activity. The department stated, "Together, we can keep Stockbridge safe. Thank you for your vigilance and partnership."
+Police remind citizens to "Hide, Lock, Take" to prevent future incidents: hide valuables, lock doors, and take keys. Anyone with information is asked to call 770-957-9121 for non-emergencies.`,
+      textBlock2: `Nearly two dozen cars were broken into in Stockbridge neighborhoods on Saturday night, according to police.
+Nineteen car break-ins were reported in the area of the Glynn Addy, Gardens at Eagles Landing, Windsong Plantation, and Wild Wind subdivisions, Stockbridge police said.
+Investigators have not shared if they’ve identified any suspects.
+Officers ask the public to be careful about belongings left in cars. They’re urging everyone to hide any valuables that might be inside and to lock their doors and take their keys with them.
+Investigators ask that neighbors with security camera footage review the video and share anything suspicious. Anyone with information on the case should contact police at (770) 957-9121.
+“Together, we can keep Stockbridge safe,” police said. “Thank you for your vigilance and partnership.”`,
+      options: ["Story #1", "Story #2"],
+      correct: "Story #1",
+    },
+    {
+      textBlock1: `The Louisiana Office of Motor Vehicles (OMV) has introduced a new "Seizure Indicator" option for state driver's licenses and ID cards, a move aimed at enhancing public safety and communication for individuals with seizure disorders.
+"The Louisiana Office of Motor Vehicles is proud to announce a new option aimed at enhancing public safety and communication," stated the OMV in a recent Facebook post. This indicator allows those diagnosed by a medical professional to have their condition noted on their identification.
+The new feature is available on all license classes and ID cards, can be combined with Autism or Needs Accommodation indicators, and comes with no fee to add or remove. It can also be removed at any time without additional documentation. This initiative underscores the OMV's commitment "to support and protect individuals with medical needs in Louisiana."`,
+      textBlock2: `Louisiana residents diagnosed with a seizure disorder can now choose to have a seizure indicator added to their driver’s license or identification card, according to the Louisiana Office of Motor Vehicles.
+The indicator is designed to promote health awareness and provide important information to law enforcement and first responders during emergencies. It is optional and available for any class of license or ID except handicap and voter ID cards.
+The seizure designation can be combined with the Needs Accommodation and Autism indicators, and may be removed at any time at the applicant’s request.
+How to Apply: Applicants must submit a Medical Examiner’s Certification of Seizure Disorder form completed by a licensed medical or mental health professional authorized in Louisiana or any U.S. state or territory.
+If the certifying professional indicates the applicant has not been seizure-free for six months, the OMV will require an additional neurological medical report from the applicant’s treating physician.
+Louisiana law requires individuals to be seizure-free for at least six months to maintain valid driving privileges.`,
+      options: ["Story #1", "Story #2"],
+      correct: "Story #1",
+    },
+  ];
+
+  const quizContainer = document.querySelector(".quiz-container");
+  const questionNumberEl = document.querySelector(".question-number");
+  const options = document.querySelector(".options");
+  const nextBtn = document.querySelector(".next-btn");
+  const quizResult = document.querySelector(".quiz-result");
+  const startBtnContainer = document.querySelector(".start-btn-container");
+  const startBtn = document.querySelector(".start-btn");
+  const textBlock1El = document.getElementById("text-block-1");
+  const textBlock2El = document.getElementById("text-block-2");
+
+
+  let questionNumber = 0;
+  let score = 0;
+  const MAX_QUESTIONS = 3;
+
+  const shuffleArray = (array) => array.slice().sort(() => Math.random() - 0.5);
+
+  quizData = shuffleArray(quizData);
+
+  const resetLocalStorage = () => {
+    for (let i = 0; i < MAX_QUESTIONS; i++) {
+      localStorage.removeItem(`userAnswer_${i}`);
+    }
+  };
+
+  const checkAnswer = (e) => {
+    const userAnswer = e.target.textContent;
+    const correctAnswer = quizData[questionNumber].correct;
+
+    if (userAnswer === correctAnswer) {
+      score++;
+      e.target.classList.add("correct");
+    } else {
+      e.target.classList.add("incorrect");
+    }
+
+    localStorage.setItem(`userAnswer_${questionNumber}`, userAnswer);
+
+    const allOptions = document.querySelectorAll(".option");
+    allOptions.forEach((o) => o.classList.add("disabled"));
+  };
+
+  const createQuestion = () => {
+    const currentQuestion = quizData[questionNumber];
+
+    options.innerHTML = "";
+    // Use the new formatTextToParagraphs function
+    textBlock1El.innerHTML = formatTextToParagraphs(currentQuestion.textBlock1);
+    textBlock2El.innerHTML = formatTextToParagraphs(currentQuestion.textBlock2);
+
+    questionNumberEl.textContent = `Question ${questionNumber + 1} of ${MAX_QUESTIONS}`;
+
+    const optionsList = currentQuestion.options;
+
+    optionsList.forEach((opt) => {
+      const option = document.createElement("button");
+      option.classList.add("option");
+      option.textContent = opt;
+      option.addEventListener("click", checkAnswer);
+      options.appendChild(option);
+    });
+  };
+
+  const displayQuizResult = () => {
+    quizResult.innerHTML = "";
+    quizResult.style.display = "flex";
+    quizContainer.style.display = "none";
+
+    const resultHeading = document.createElement("h2");
+    resultHeading.textContent = `You scored ${score} out of ${MAX_QUESTIONS}`;
+    quizResult.appendChild(resultHeading);
+
+    for (let i = 0; i < MAX_QUESTIONS; i++) {
+      const resultItem = document.createElement("div");
+      resultItem.classList.add("question-container");
+
+      const userAnswer = localStorage.getItem(`userAnswer_${i}`) || "Not Answered";
+      const correctAnswer = quizData[i].correct;
+
+      if (userAnswer !== correctAnswer) {
+        resultItem.classList.add("incorrect");
+      }
+      if (userAnswer == correctAnswer) {
+        resultItem.classList.add("correct");
+      }
+
+      resultItem.innerHTML = `
+        <div class="result-text-blocks">
+          <p><strong>Story #1:</strong><br>${formatTextToParagraphs(quizData[i].textBlock1)}</p>
+          <p><strong>Story #2:</strong><br>${formatTextToParagraphs(quizData[i].textBlock2)}</p>
+        </div>
+        <div><strong>Your answer:</strong><br>  ${userAnswer}</div>
+        <div><strong>Correct answer:</strong> <br> ${correctAnswer}</div>
+      `;
+
+      quizResult.appendChild(resultItem);
+    }
+
+    const retakeBtn = document.createElement("button");
+    retakeBtn.textContent = "Retake Quiz";
+    retakeBtn.classList.add("retake-btn");
+    retakeBtn.addEventListener("click", () => {
+      questionNumber = 0;
+      score = 0;
+      quizData = shuffleArray(quizData);
+      resetLocalStorage();
+      quizResult.style.display = "none";
+      quizContainer.style.display = "block";
+      createQuestion();
+    });
+
+    quizResult.appendChild(retakeBtn);
+  };
+
+  const displayNextQuestion = () => {
+    if (questionNumber >= MAX_QUESTIONS - 1) {
+      displayQuizResult();
+    } else {
+      questionNumber++;
+      createQuestion();
+    }
+  };
+
+  nextBtn.addEventListener("click", displayNextQuestion);
+
+  startBtn.addEventListener("click", () => {
+    startBtnContainer.style.display = "none";
+    quizContainer.style.display = "block";
+    resetLocalStorage();
+    createQuestion();
+  });
+</script>
+
+</html>
