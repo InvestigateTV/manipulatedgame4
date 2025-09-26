@@ -8,13 +8,40 @@
         body {
             font-family: sans-serif;
             text-align: center;
+            font-color: #fff;
             margin: 20px;
-            background-color: #f0f0f0;
+            background-color: #000;
         }
+         
+         .footer-logo {
+         background: rgba(93, 146, 88, 0.7);
+  			color: #FFF; 
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: normal;
+         }
+         .footer-logo .special-font{
+         	font-family: "Montserrat", sans-serif;
+    		font-weight: bold;
+            color: #FFF;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    		font-size:16px;
+         }
+         .footer-logo img{
+         	display: block;
+        	max-width: 15%;
+            max-height: 15%;
+            margin: auto;
+            }
+         
         #start-screen, #game-screen {
             max-width: 800px;
             margin: 0 auto;
-            background-color: #fff;
+            background-color: #000;
+            font-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -40,6 +67,10 @@
         button:hover {
             background-color: #0056b3;
         }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
         .footer-logo {
             margin-top: 30px;
         }
@@ -49,14 +80,26 @@
         }
         .hotspot {
             position: absolute;
-            background-color: rgba(255, 0, 0, 0.3); /* Semi-transparent red for visibility, remove for production */
             cursor: pointer;
-            border: 1px solid red; /* Border for visibility, remove for production */
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            transform: translate(-50%, -50%); /* For centering the hotspot based on x,y */
+
+            /* Invisible by default */
+            background-color: transparent;
+            border: 1px solid transparent;
+            transition: background-color 0.2s, border-color 0.2s; /* Smooth transition for appearance */
         }
-        .hotspot:hover {
-            background-color: rgba(255, 0, 0, 0.6); /* Hover effect, remove for production */
+        /* No hover effect for invisible hotspots */
+
+        /* Class for when "Show Answers" is clicked - makes them red and adds hover */
+        .hotspot-red-visible {
+            background-color: rgba(255, 0, 0, 0.3); /* Semi-transparent red */
+            border: 1px solid red; /* Red border */
         }
+        .hotspot-red-visible:hover {
+            background-color: rgba(255, 0, 0, 0.6); /* Red hover effect */
+        }
+
         #popup-modal {
             display: none; /* Hidden by default */
             position: fixed; /* Stay in place */
@@ -90,18 +133,20 @@
             color: black;
             text-decoration: none;
         }
+       
     </style>
 </head>
 <body>
 
     <div id="start-screen">
-        <h1>InvestigateTV - mAnIpulated: Is it AI?</h1>
         <img src="https://raw.githubusercontent.com/InvestigateTV/manipulatedgame1/main/images/manipulated_matchup.png" alt="Illustration of a hand below a glowing set of lines and dots designed to represent artificial intelligence. The words manipulated matchup are printed above the illustration">
-        <p>Test your skills at identifying AI generated images</p>
+        <h3>Can you find the AI?</h3>
+        <p>Test your skills at identifying what gives away an AI-generated image.</p>
         <button id="start-quiz-button">Start Quiz</button>
-        <p><a href="https://www.investigatetv.com/">Exit to the mAnIpulated Homepage</a></p>
+        
         <div class="footer-logo">
-            <img src="https://raw.githubusercontent.com/InvestigateTV/manipulatedgame1/main/images/GTV-Clear-Logomark-RGB-color.png" alt="Gray Media Logo: Colorful partial circles arranged to form the letter G">
+            <a href="https://www.investigatetv.com/">Exit to the mAnIpulated Homepage</a>
+           <br> <img src="https://raw.githubusercontent.com/InvestigateTV/manipulatedgame1/main/images/GTV-Clear-Logomark-RGB-color.png" alt="Gray Media Logo: Colorful partial circles arranged to form the letter G">
         </div>
     </div>
 
@@ -112,6 +157,7 @@
             <img id="game-image" src="" alt="Question Image">
             <!-- Hotspots will be dynamically added here -->
         </div>
+        <button id="show-answers-button">Show me the answers!</button> <!-- Button text is fixed -->
         <button id="return-to-start-button">Return to Start</button>
         <div class="footer-logo">
             <img src="https://raw.githubusercontent.com/InvestigateTV/manipulatedgame1/main/images/GTV-Clear-Logomark-RGB-color.png" alt="Gray Media Logo: Colorful partial circles arranged to form the letter G">
@@ -136,123 +182,121 @@
         const popupModal = document.getElementById('popup-modal');
         const closeButton = document.querySelector('.close-button');
         const popupText = document.getElementById('popup-text');
+        const showAnswersButton = document.getElementById('show-answers-button');
 
         // Define your question sets
-        // Each object in the array is a question set.
-        // 'image': URL of the image for this question.
-        // 'hotspots': An array of objects, each defining a clickable area on the image.
-        //             'x', 'y': Top-left coordinates of the hotspot relative to the image.
-        //             'width', 'height': Dimensions of the hotspot.
-        //             'text': The text to display in the pop-up when this hotspot is clicked.
         const questions = [
-            {
-                image: "https://via.placeholder.com/600x400/FF0000/FFFFFF?text=Question+1+Image",
+             {
+                image: "https://raw.githubusercontent.com/InvestigateTV/manipulatedgame4/main/images/Manipulated%20Game%204%20(1).png",
                 hotspots: [
-                    { x: 50, y: 50, width: 100, height: 50, text: "This is the top-left section of the image for Question 1. It highlights a key detail." },
-                    { x: 200, y: 150, width: 80, height: 80, text: "This is a prominent feature in the middle of the image for Question 1, perhaps an anomaly." },
-                    { x: 450, y: 300, width: 120, height: 60, text: "Here's a specific element in the bottom-right corner for Question 1, providing context." }
+                    { x: 36, y: 55, width: 32, height: 30, text: "The lighting on the raccoon does not match the rest of the image. For example, the front leg is brightly backlit, but the animal does not have a sharp visible shadow on the wooden floor." },
+                    { x: 50, y: 12, width: 65, height: 20, text: "The background has ripples and blurs that are not indicative of a shallow depth of field, but of pixel generation." },
+                    { x: 9, y: 46, width: 22, height: 65, text: "Despite being in focus, the plants in this image do not have distinct stems and leaves. In some cases leaves appear at random or are repeated in an unnatural manner. Additionally, the edge and texture of the flower pot is warped, and there is a strange hole in the side." },
+                    { x: 89, y: 30, width: 10, height: 55, text: "The edge of the doorframe shows many anomalies, including ripples at the edge, variations in texture and slight shifts lighting direction."}
                 ]
             },
             {
-                image: "https://via.placeholder.com/600x400/00FF00/000000?text=Question+2+Image",
+                image: "https://raw.githubusercontent.com/InvestigateTV/manipulatedgame4/main/images/Manipulated%20Game%204%20(2).png",
                 hotspots: [
-                    { x: 10, y: 10, width: 100, height: 100, text: "Area 1 description for Question 2. This part shows something interesting." },
-                    { x: 300, y: 80, width: 150, height: 70, text: "Area 2 description for Question 2. Notice this particular aspect." }
+                    { x: 55, y: 65, width: 10, height: 10, text: "The temperature of the lighting on the child's face is different than the rest of the image." },
+                    { x: 70.6, y: 85.8, width: 10, height: 10, text: "The child's left hand is missing." },
+                    { x: 62, y: 33, width: 50, height: 10, text: "Several of the stadium seats exhibit unexplained ripples or blurs, such as the missing corner of this chair." }
                 ]
             },
-            {
-                image: "https://via.placeholder.com/600x400/0000FF/FFFFFF?text=Question+3+Image",
+
+             {
+                image: "https://raw.githubusercontent.com/InvestigateTV/manipulatedgame4/main/images/Manipulated%20Game%204%20(3).png",
                 hotspots: [
-                    { x: 150, y: 200, width: 200, height: 100, text: "Description for the main subject of Question 3." },
-                    { x: 50, y: 300, width: 80, height: 40, text: "A small detail on the left side of Question 3." }
+                    { x: 68, y: 36, width: 12, height: 12, text: "The bridge does not connect to anything." },
+                    { x: 84.7, y: 37.2, width: 10, height: 10, text: "The streetlight appears to grow out of the middle of the roadway, and the roadway surface is rippled and improperly blurred." },
+                    { x: 22, y: 42, width: 25, height: 25, text: "The shadows of the trees are incongruent with their position, and in some cases appear on top of other elements in the image." },
+                    { x: 66, y: 78, width: 25, height: 15, text: "Water rapids appear where the flow of this flooded river and the position of the debris would make them impossible. There is also suspicious blurring in this area." },
+                    { x: 52, y: 27, width: 15, height: 20, text: "The powerlines supposedly connected to this tower are disjointed or disappear all together in blurs and ripples."},
                 ]
-            }
-            // Add more question sets here following the same structure.
-            // Remember to replace placeholder image URLs with your actual image URLs.
-            // Adjust 'x', 'y', 'width', 'height' for each hotspot to match your image and desired clickable areas.
+            },
         ];
 
-        let currentQuestion = null; // To store the currently loaded question data
+        let currentQuestion = null;
 
         // Function to initialize the game and load a random question
         function initGame() {
-            // Hide the start screen and show the game screen
             startScreen.style.display = 'none';
             gameScreen.style.display = 'block';
 
-            // Clear any previously created hotspots from the container
             questionImageContainer.querySelectorAll('.hotspot').forEach(hotspot => hotspot.remove());
 
-            // Select a random question set from the 'questions' array
             const randomIndex = Math.floor(Math.random() * questions.length);
             currentQuestion = questions[randomIndex];
-
-            // Set the source of the game image to the selected question's image
             gameImage.src = currentQuestion.image;
 
-            // Wait for the image to fully load before attempting to create hotspots.
-            // This ensures that the image's dimensions are available for accurate positioning.
             gameImage.onload = () => {
-                // Iterate through the hotspots defined for the current question and create them
                 currentQuestion.hotspots.forEach(hotspotData => {
                     createHotspot(hotspotData);
                 });
+                // Ensure the "Show me the answers!" button is enabled for a new game
+                showAnswersButton.disabled = false;
             };
         }
 
         // Function to create a clickable hotspot div on the image
         function createHotspot(hotspotData) {
             const hotspotDiv = document.createElement('div');
-            hotspotDiv.classList.add('hotspot'); // Add the 'hotspot' class for styling
+            hotspotDiv.classList.add('hotspot'); // Hotspots are invisible by default
 
-            // Set the position and dimensions of the hotspot using inline styles
-            // 'x' and 'y' are relative to the top-left of the image container
-            hotspotDiv.style.left = `${hotspotData.x}px`;
-            hotspotDiv.style.top = `${hotspotData.y}px`;
-            hotspotDiv.style.width = `${hotspotData.width}px`;
-            hotspotDiv.style.height = `${hotspotData.height}px`;
+            hotspotDiv.style.left = `${hotspotData.x}%`;
+            hotspotDiv.style.top = `${hotspotData.y}%`;
+            hotspotDiv.style.width = `${hotspotData.width}%`;
+            hotspotDiv.style.height = `${hotspotData.height}%`;
+            hotspotDiv.style.transform = 'translate(-50%, -50%)';
 
-            // Add a click event listener to the hotspot
             hotspotDiv.addEventListener('click', () => {
-                showPopup(hotspotData.text); // When clicked, show the pop-up with the hotspot's text
+                showPopup(hotspotData.text);
             });
 
-            // Append the newly created hotspot div to the image container
             questionImageContainer.appendChild(hotspotDiv);
+        }
+
+        // Function to reveal the red hotspots
+        function revealRedHotspots() {
+            const allHotspots = questionImageContainer.querySelectorAll('.hotspot');
+            allHotspots.forEach(hotspot => {
+                hotspot.classList.add('hotspot-red-visible'); // Add the red styling class
+            });
+            showAnswersButton.disabled = true; // Disable the button after revealing answers
         }
 
         // Function to display the pop-up modal with specified text
         function showPopup(text) {
-            popupText.textContent = text; // Set the text content of the pop-up
-            popupModal.style.display = 'block'; // Make the modal visible
+            popupText.textContent = text;
+            popupModal.style.display = 'block';
         }
 
         // Function to hide the pop-up modal
         function hidePopup() {
-            popupModal.style.display = 'none'; // Hide the modal
+            popupModal.style.display = 'none';
         }
 
-        // Event Listeners for buttons and modal interactions
-
-        // When the "Start Quiz" button is clicked, start the game
+        // Event Listeners
         startQuizButton.addEventListener('click', initGame);
 
-        // When the "Return to Start" button is clicked, go back to the start screen
         returnToStartButton.addEventListener('click', () => {
-            gameScreen.style.display = 'none'; // Hide the game screen
-            startScreen.style.display = 'block'; // Show the start screen
-            hidePopup(); // Ensure the pop-up is hidden when returning to start
+            gameScreen.style.display = 'none';
+            startScreen.style.display = 'block';
+            hidePopup();
+            // Re-enable the "Show me the answers!" button when returning to start
+            showAnswersButton.disabled = false;
         });
 
-        // When the close button (X) in the pop-up is clicked, hide the pop-up
         closeButton.addEventListener('click', hidePopup);
 
-        // Close the modal if the user clicks anywhere outside of the modal content
         window.addEventListener('click', (event) => {
             if (event.target == popupModal) {
                 hidePopup();
             }
         });
+
+        // Event listener for the "Show me the answers!" button
+        showAnswersButton.addEventListener('click', revealRedHotspots);
     </script>
 
 </body>
